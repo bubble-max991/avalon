@@ -2,6 +2,13 @@
   box-sizing: border-box;
 }
 
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 :root {
   --bg: #0c1020;
   --panel: #171d33;
@@ -24,6 +31,8 @@ body {
 
 .app {
   width: min(100%, 760px);
+  min-width: 0;
+  max-width: 100%;
   margin: 0 auto;
   min-height: 100vh;
   padding: 20px;
@@ -31,6 +40,9 @@ body {
 
 .page {
   display: none;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   min-height: calc(100vh - 40px);
   align-items: center;
   justify-content: center;
@@ -67,6 +79,10 @@ h2 {
 
 .card {
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-x: clip;
   background: rgba(23, 29, 51, .94);
   border: 1px solid var(--border);
   border-radius: 22px;
@@ -618,6 +634,9 @@ button:disabled { cursor: not-allowed; opacity: .45; }
 .live-vote-summary small { color: var(--muted); }
 
 .history-section {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   margin-top: 34px;
   padding-top: 18px;
   border-top: 1px solid var(--border);
@@ -653,7 +672,19 @@ button:disabled { cursor: not-allowed; opacity: .45; }
   background: rgba(201, 91, 106, .18);
 }
 
-.proposal-history { display: grid; gap: 20px; }
+.proposal-history {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  gap: 20px;
+}
+
+.mission-history-group {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
 
 .mission-history-group h4 {
   margin: 0 0 10px;
@@ -662,8 +693,13 @@ button:disabled { cursor: not-allowed; opacity: .45; }
 }
 
 .history-table-scroll {
+  display: block;
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
   overflow-x: auto;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x pan-y;
   border: 1px solid var(--border);
   border-radius: 14px;
   -webkit-overflow-scrolling: touch;
@@ -806,6 +842,7 @@ button:disabled { cursor: not-allowed; opacity: .45; }
   .current-leader-card { grid-template-columns: auto minmax(0, 1fr); }
   .current-leader-card small { grid-column: 2; }
   .history-table { min-width: 760px; table-layout: fixed; }
+  .history-table-scroll { width: 100%; max-width: 100%; }
   .mission-node { padding: 7px 2px; }
   .mission-node span { font-size: 10px; }
   .mission-node small { font-size: 9px; }
