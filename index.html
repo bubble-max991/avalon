@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Avalon 線下助手</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app">
+    <section id="home" class="page active">
+      <div class="hero">
+        <div class="crest">♛</div>
+        <h1>AVALON</h1>
+        <p>線下遊戲助手</p>
+        <button class="primary" onclick="goTo('setup')">開始遊戲</button>
+      </div>
+    </section>
+
+    <section id="setup" class="page">
+      <div class="card">
+        <h2>1. 選擇玩家人數</h2>
+        <div class="player-count">
+          <button onclick="changePlayerCount(-1)">−</button>
+          <strong id="playerCountText">7 人</strong>
+          <button onclick="changePlayerCount(1)">＋</button>
+        </div>
+
+        <div class="team-summary" id="teamSummary"></div>
+
+        <h2>2. 選擇特殊角色</h2>
+        <div class="role-list" id="roleList"></div>
+
+        <p class="hint">梅林與刺客預設勾選；不足的名額會自動補成忠臣與爪牙。</p>
+        <div class="mode-actions">
+          <button class="primary" onclick="startNarratorOnly()">使用實體角色・開始天黑主持</button>
+          <button class="secondary full-width" onclick="showRoleConfirmation()">使用網頁分配身分</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="confirm" class="page">
+      <div class="card">
+        <p class="step-label">角色設定完成</p>
+        <h2>確認身分組成</h2>
+        <p class="hint">請確認本局角色，尚未進行隨機分配。</p>
+        <div id="roleConfirmation" class="confirmation-grid"></div>
+        <div class="button-row two-columns">
+          <button class="secondary" onclick="goTo('setup')">返回修改</button>
+          <button class="primary compact" onclick="buildNameInputs()">確認並繼續</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="names" class="page">
+      <div class="card">
+        <h2>輸入玩家名字</h2>
+        <div id="nameInputs"></div>
+        <button class="primary" onclick="startGame()">分配角色</button>
+      </div>
+    </section>
+
+    <section id="reveal" class="page">
+      <div class="card reveal-card">
+        <div id="revealContent"></div>
+      </div>
+    </section>
+
+    <section id="night" class="page">
+      <div class="card">
+        <h2>🌙 天黑階段</h2>
+        <p id="nightStepText" class="night-text"></p>
+        <div id="nightCountdown" class="night-countdown" aria-live="polite"></div>
+        <div class="progress">
+          <div id="nightProgress"></div>
+        </div>
+        <label class="voice-setting">
+          <span>主持語音</span>
+          <select id="voiceSelect" onchange="saveVoicePreference()">
+            <option value="">自動選擇台灣中文語音</option>
+          </select>
+        </label>
+        <div class="button-row">
+          <button class="secondary" onclick="prevNightStep()">上一句</button>
+          <button class="primary" onclick="speakCurrentStep()">播放語音</button>
+          <button class="secondary" onclick="nextNightStep()">下一句</button>
+        </div>
+        <div class="auto-play-panel">
+          <p class="hint">自動模式會依序播放全部指示，句子之間會保留操作時間。</p>
+          <div class="button-row playback-controls">
+            <button id="playAllButton" class="primary compact" onclick="playAllNightSteps()">▶ 從頭播放</button>
+            <button id="pauseResumeButton" class="secondary" onclick="toggleNightPause()" disabled>⏸ 暫停</button>
+            <button id="stopAllButton" class="secondary" onclick="stopNightPlayback()" disabled>停止播放</button>
+          </div>
+        </div>
+        <button class="ghost" onclick="restartGame()">重新開局</button>
+      </div>
+    </section>
+  </main>
+
+  <div class="version-badge">V0.6.3</div>
+
+  <script src="app.js"></script>
+</body>
+</html>
