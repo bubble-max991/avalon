@@ -14,6 +14,7 @@
         <h1>AVALON</h1>
         <p>線下遊戲助手</p>
         <button class="primary" onclick="goTo('setup')">開始遊戲</button>
+        <button id="resumeTrackerButton" class="secondary full-width hidden" onclick="resumeSavedTracker()">繼續上次遊戲紀錄</button>
       </div>
     </section>
 
@@ -93,12 +94,140 @@
             <button id="stopAllButton" class="secondary" onclick="stopNightPlayback()" disabled>停止播放</button>
           </div>
         </div>
+        <button class="primary tracker-entry" onclick="openGameTracker()">進入遊戲紀錄</button>
         <button class="ghost" onclick="restartGame()">重新開局</button>
+      </div>
+    </section>
+
+    <section id="trackerNames" class="page">
+      <div class="card">
+        <p class="step-label">遊戲紀錄</p>
+        <h2>輸入玩家名字</h2>
+        <p class="hint name-order-hint">請依照座位順序填寫。順時針或逆時針皆可，只要所有玩家依序排列；後續隊長會按照這個順序自動輪替。</p>
+        <div id="trackerNameInputs"></div>
+        <label class="field-label" for="initialLeaderSelect">第一輪隊長</label>
+        <select id="initialLeaderSelect" class="tracker-select"></select>
+        <div class="button-row two-columns tracker-name-actions">
+          <button class="secondary" onclick="goTo('night')">返回天黑主持</button>
+          <button class="primary compact" onclick="startTrackerFromNames()">開始紀錄</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="tracker" class="page tracker-page">
+      <div class="card">
+        <div class="tracker-heading">
+          <div>
+            <p class="step-label">遊戲紀錄</p>
+            <h2 id="trackerRoundTitle">第 1 任務・第 1 次提案</h2>
+          </div>
+          <span id="trackerTeamRequirement" class="requirement-badge"></span>
+        </div>
+
+        <div id="missionProgress" class="mission-progress" aria-label="任務進度"></div>
+
+        <div id="trackerEditor">
+          <span class="field-label">本次隊長</span>
+          <div class="current-leader-card">
+            <span>👑</span>
+            <strong id="currentLeaderName"></strong>
+            <small>下一次提案將自動輪替</small>
+          </div>
+
+          <div class="field-heading">
+            <span class="field-label">出任務玩家</span>
+            <small id="teamSelectionCount"></small>
+          </div>
+          <div id="teamMemberChoices" class="player-choice-grid"></div>
+
+          <div class="field-heading vote-heading">
+            <span class="field-label">組隊投票</span>
+            <small>預設全員反對</small>
+          </div>
+          <div class="bulk-vote-actions">
+            <button class="vote-button approve" onclick="setAllVotes('approve')">全部同意</button>
+            <button class="vote-button reject" onclick="setAllVotes('reject')">全部反對</button>
+          </div>
+          <div id="voteChoices" class="vote-list"></div>
+          <div id="liveVoteSummary" class="live-vote-summary"></div>
+          <button class="primary" onclick="confirmProposal()">確認本次提案</button>
+        </div>
+
+        <div id="missionResultPanel" class="mission-result-panel hidden">
+          <p class="step-label">組隊已通過</p>
+          <h3 id="missionResultTitle"></h3>
+          <p id="missionTeamNames" class="mission-team-names"></p>
+          <div class="failure-counter">
+            <span>失敗票數</span>
+            <div class="counter-controls">
+              <button onclick="changeMissionFailCount(-1)">−</button>
+              <strong id="missionFailCount">0</strong>
+              <button onclick="changeMissionFailCount(1)">＋</button>
+            </div>
+          </div>
+          <p id="missionRuleHint" class="hint mission-rule-hint"></p>
+          <div id="missionLiveResult" class="mission-live-result"></div>
+          <button class="primary" onclick="confirmMissionResult()">確認任務結果</button>
+        </div>
+
+        <div id="assassinationPanel" class="assassination-panel hidden">
+          <div class="assassination-icon">🗡️</div>
+          <h3>刺殺梅林</h3>
+          <p>正義陣營已完成三次任務。請由刺客選擇梅林，再記錄刺殺結果。</p>
+          <div class="button-row two-columns assassination-actions">
+            <button class="secondary assassination-success" onclick="confirmAssassination(true)">刺殺成功</button>
+            <button class="primary compact" onclick="confirmAssassination(false)">刺殺失敗</button>
+          </div>
+        </div>
+
+        <div id="trackerFinished" class="tracker-finished hidden"></div>
+
+        <section class="history-section">
+          <h3>任務結果</h3>
+          <div id="missionHistory" class="proposal-history"></div>
+        </section>
+
+        <section class="history-section">
+          <h3>提案紀錄</h3>
+          <div id="proposalHistory" class="proposal-history"></div>
+        </section>
+
+        <div id="editProposalModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="editProposalTitle">
+          <div class="modal-card">
+            <div class="modal-heading">
+              <h3 id="editProposalTitle">修改提案紀錄</h3>
+              <button class="modal-close" onclick="closeProposalEditor()" aria-label="關閉">×</button>
+            </div>
+            <p id="editProposalLeader" class="hint"></p>
+            <div class="field-heading">
+              <span class="field-label">出任務玩家</span>
+              <small id="editTeamSelectionCount"></small>
+            </div>
+            <div id="editTeamChoices" class="player-choice-grid"></div>
+            <div class="field-heading vote-heading">
+              <span class="field-label">組隊投票</span>
+            </div>
+            <div class="bulk-vote-actions">
+              <button class="vote-button approve" onclick="setAllEditVotes('approve')">全部同意</button>
+              <button class="vote-button reject" onclick="setAllEditVotes('reject')">全部反對</button>
+            </div>
+            <div id="editVoteChoices" class="vote-list"></div>
+            <div class="button-row two-columns modal-actions">
+              <button class="secondary" onclick="closeProposalEditor()">取消</button>
+              <button class="primary compact" onclick="saveProposalEdit()">儲存修改</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="button-row two-columns tracker-footer">
+          <button class="secondary" onclick="goTo('night')">返回天黑主持</button>
+          <button class="ghost danger-ghost" onclick="resetTracker()">清除紀錄</button>
+        </div>
       </div>
     </section>
   </main>
 
-  <div class="version-badge">V0.6.3</div>
+  <div class="version-badge">V1.3.0</div>
 
   <script src="app.js"></script>
 </body>
